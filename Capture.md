@@ -1,3 +1,3 @@
-![캡처1](https://github.com/JihoonJang/CapstoneDesign/blob/master/%EC%A0%90%EC%9E%90%EC%83%9D%EC%84%B1%EA%B8%B0_03.jpg)</br></br>
-![캡처1](https://github.com/JihoonJang/CapstoneDesign/blob/master/%EC%A0%90%EC%9E%90%EC%83%9D%EC%84%B1%EA%B8%B0_03.jpg)</br></br>
-![캡처1](https://github.com/JihoonJang/CapstoneDesign/blob/master/%EC%A0%90%EC%9E%90%EC%83%9D%EC%84%B1%EA%B8%B0_03.jpg)</br></br>
+![캡처1](https://github.com/JihoonJang/Capstone_Team1/blob/master/resources/%EC%BA%A1%EC%B2%981.PNG)</br></br>
+![캡처2](https://github.com/JihoonJang/Capstone_Team1/blob/master/resources/%EC%BA%A1%EC%B2%982.PNG)</br></br>
+![캡처3](https://github.com/JihoonJang/Capstone_Team1/blob/master/resources/%EC%BA%A1%EC%B2%983.PNG)</br></br>
