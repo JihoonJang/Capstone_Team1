@@ -13,7 +13,6 @@ import {
 import Swiper from 'react-native-swiper';
 import {Speech} from 'expo';
 
-const DURATION = 1000;
 
 const string = ['자 모음 연습','낱말 연습', '텍스트 변환'];
 const styles = StyleSheet.create({
