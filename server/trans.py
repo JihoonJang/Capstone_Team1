@@ -1,3 +1,10 @@
 # -*- coding: utf-8  -*-
+import sys
+import json
 import hbcvt
-print(hbcvt.h2b.text("꽃이 피었어!"))
+flag = sys.argv[1]
+def tr(a):
+    print(str(hbcvt.h2b.text(str(a))))
+    print(flag) 
+tr(flag)
+
