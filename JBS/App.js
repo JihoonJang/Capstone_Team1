@@ -11,10 +11,12 @@ import {
 } from 'react-native';
 
 import { _makeMethod, _getResponse, result } from './Networking.js';
+import CameraCaputre from './Cam.js';
 import Swiper from 'react-native-swiper';
 import { FileSystem, Permissions, Audio, Speech } from 'expo';
+import {createStackNavigator, createAppContainer} from 'react-navigation';
 
-const DURATION = 1000;
+
 
 const string = ['자 모음 연습', '낱말 연습', '텍스트 변환'];
 const styles = StyleSheet.create({
@@ -52,7 +54,7 @@ const styles = StyleSheet.create({
   }
 })
 
-const menu = ['사용법을 들으시려면 화면을 터치하세요', '자음 연습', '모음 연습', '낱말 연습', '음성 텍스트 변환'];
+const menu = ['사용법을 들으시려면 화면을 터치하세요', '자음 연습', '모음 연습', '낱말 연습', '음성 텍스트 변환','사진 텍스트 변환'];
 const explain = ['저희가 제공하는 학습 기능은 자음 연습, 모음 연습, 낱말 연습, 텍스트 변환이 있습니다. 각 학습 메뉴로 이동하려면 화면을 스와이프하여 넘기세요. 각 메뉴에서 해당 설명을 들으시려면 화면을 길게 터치하시고, 학습을 시작하려면 화면을 짧게 터치하시면 됩니다.',
   '자음 연습입니다. 한국어의 자음은 총 14개 입니다. 점자판에 기역. 부터 순서대로 표시되며, 자음 하나에 해당하는 점자를 읽으신 후 화면을 터치하시면 계속 안내를 해 드리겠습니다. 자음 연습을 시작하려면 화면을 짧게 터치해주세요.',
   '모음 연습입니다. 한국어의 모음은 총 10개 입니다. 점자판에 아. 부터 순서대로 표시되며, 모음 하나에 해당하는 점자를 읽으신 후 화면을 터치하시면 계속 안내를 해 드리겠습니다. 모음 연습을 시작하려면 화면을 짧게 터치해주세요.',
@@ -63,10 +65,13 @@ const Count = ['', '첫', '두', '세', '네', '다섯', '여섯', '일곱', '�
 const Consonant = ['', '기역', '니은', '디귿', '리을', '미음', '비읍', '시옷', '이응', '지읃', '치읃', '키윽', '티읃', '피읍', '히읗'];
 const Vowel = ['', 'ㅏ.', 'ㅑ.', 'ㅓ.', 'ㅕ.', 'ㅗ.', 'ㅛ.', 'ㅜ.', 'ㅠ.', 'ㅡ.', 'ㅣ.'];
 
-const forRecord = ['녹음을 시작합니다. 화면을 터치해주세요.', '녹음이 종료되었습니다.']
+const forRecord = ['녹음을 시작합니다. 화면을 터치하세요. 녹음이 끝나면 화면을 다시 터치해주세요.', '녹음이 종료되었습니다.']
 
 
-export default class Home extends Component {
+
+
+
+class Home extends Component {
   constructor(props) {
     super(props);
     this.recording = null;
@@ -141,6 +146,15 @@ export default class Home extends Component {
 
   }
 
+  async _playBeep() {
+    await Audio.setIsEnabledAsync(true);
+    const beep = new Audio.Sound();
+    await beep.loadAsync(require('./beep.mp3'));
+    await beep.setPositionAsync(6500);
+    await beep.playFromPositionAsync();
+    //await beep.stopAsync();
+
+  }
   _askForPermissions = async () => {
     const response = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
     this.setState({
@@ -165,27 +179,28 @@ export default class Home extends Component {
       this.state.flagRecording = 1;
 
 
-      //await this._Speech(forRecord[0]);
+      await this._Speech(forRecord[0]);
 
       console.log('Recording Ready');
 
-      //this.recording = recording;
 
-      //await recording.startAsync();
-      //await recording.stopAndUnloadAsync();
+      if (this.sound !== null) {
+        this.sound = null;
+      }
+      if (this.recording !== null) {
+        this.recording.setOnRecordingStatusUpdate(null);
+        this.recording = null;
+      }
 
 
-      
 
-      
-
-      // You are now recording!
 
       return;
     }
     if (this.state.haveRecordingPermissions === true && this.state.flagRecording === 1) {
       this.state.flagRecording = 2;
 
+      this._playBeep();
 
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
@@ -193,7 +208,7 @@ export default class Home extends Component {
         playsInSilentModeIOS: true,
         shouldDuckAndroid: true,
         interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-        playThroughEarpieceAndroid: true,
+        playThroughEarpieceAndroid: false,
       });
 
       const recording = new Audio.Recording();
@@ -203,7 +218,7 @@ export default class Home extends Component {
       this.recording = recording;
 
       await this.recording.startAsync();
-  
+
       console.log('Recording...');
       return;
     }
@@ -214,12 +229,12 @@ export default class Home extends Component {
       console.log(this.recording.getURI());
 
       await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
+        allowsRecordingIOS: false,
         interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
         playsInSilentModeIOS: true,
         shouldDuckAndroid: true,
         interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-        playThroughEarpieceAndroid: true,
+        playThroughEarpieceAndroid: false,
       });
 
       const sound = await this.recording.createNewLoadedSoundAsync(
@@ -253,6 +268,8 @@ export default class Home extends Component {
       }
       //console.log(info);
       //console.log(this.sound);
+      this._Speech(forRecord[1]);
+      this.state.flagRecording = 0;
       return;
     }
   }
@@ -262,7 +279,6 @@ export default class Home extends Component {
     this.Record();
 
   }
-
   _Vowel() {
 
 
@@ -401,6 +417,10 @@ export default class Home extends Component {
     this._Speech('점비스에 오신 것을 환영합니다! ');
   }
 
+  async _callCam() {
+    this.props.navigator.push({id: 'CameraCapture'});
+  }
+
   componentDidMount() {
     if (this.state.flagStart === 0) {
       this.setState({ flagStart: 1 });
@@ -409,6 +429,8 @@ export default class Home extends Component {
       _getResponse(0);
 
     }
+    
+    
   }
   render() {
     this._speakMenu = this._speakMenu.bind(this);
@@ -416,6 +438,7 @@ export default class Home extends Component {
     this._Vowel = this._Vowel.bind(this);
     this._Voice_to_Text = this._Voice_to_Text.bind(this);
 
+    const {navigate} = this.props.navigation;
 
     return (
       <Swiper style={styles.wrapper} onIndexChanged={this._speakMenu.bind(Swiper.index)} loop={true} >
@@ -454,7 +477,22 @@ export default class Home extends Component {
             </View>
           </TouchableHighlight>
         </View>
+        <View style={styles.slide3}>
+          <TouchableHighlight onPress = {() => navigate('Cam')} onLongPress={() => this._speakExplain(4)} underlayColor="white">
+            <View style={styles.button}>
+              <Text style={styles.text}>사진 텍스트 변환</Text>
+            </View>
+          </TouchableHighlight>
+        </View>
       </Swiper>
     );
   }
 }
+
+const MainNavigator = createStackNavigator({
+  Home: Home,
+  Cam: CameraCaputre,
+});
+
+const App = createAppContainer(MainNavigator);
+export default App;
