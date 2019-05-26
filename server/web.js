@@ -32,7 +32,7 @@ app.get('/',(req,res) => res.send('Hello World!'))
 app.post('/',function(req,res){
 	console.log("body : " , req.body);
 	console.log("ip : ", req.ip);
-	res.send("양간마 황지영 양간마 황지영 안시이현 안시현 러시안룰룰룰룰룰렛");
+	res.send("양간마 양간마 안시이현 안시현 러시안룰룰룰룰룰렛 장지훈 모태솔로로로로로로 양간마 안시현 인간티머니");
 	let options = {
   			mode: 'text',
   			//thonPath: 'path/to/python',
