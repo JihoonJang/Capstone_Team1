@@ -7,7 +7,7 @@ import re
 
 
 
-conn = pymysql.connect(host = '18.222.102.66', user = 'root', password = '1234' ,db = 'CAP')
+conn = pymysql.connect(host = '3.15.75.68', user = 'root', password = '1234' ,db = 'CAP')
 # host = DB주소(localhost 또는 ip주소), user = DB id, password = DB password, db = DB명
 curs = conn.cursor()
 
@@ -34,7 +34,7 @@ rows = curs.fetchall() # 데이터 패치
 
 for i in rows :
      print(i)
-
+conn.commit()
 conn.close()
 
 
