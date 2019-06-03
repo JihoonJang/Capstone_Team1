@@ -7,16 +7,22 @@ import {
   Alert,
   TouchableHighlight,
   Vibration,
-  NativeModules
+  NativeModules,
+  Platform,
+  Animated,
+  AppState,
+  Image,
 } from 'react-native';
 
-import { _makeMethod, _getResponse, result } from './Networking.js';
+import { getData, _makeMethod, _getResponse, result, dataVoice } from './Networking.js';
 import CameraCaputre from './Cam.js';
+import { Intro } from './intro.js';
 import Swiper from 'react-native-swiper';
-import { FileSystem, Permissions, Audio, Speech } from 'expo';
-import {createStackNavigator, createAppContainer} from 'react-navigation';
-
-
+import { FileSystem, Permissions, Audio, Speech, Constants, Asset } from 'expo';
+import { createStackNavigator, createAppContainer, SafeAreaView } from 'react-navigation';
+if (Platform.OS === 'android') {
+  SafeAreaView.setStatusBarHeight(-100);
+}
 
 const string = ['자 모음 연습', '낱말 연습', '텍스트 변환'];
 const styles = StyleSheet.create({
@@ -26,7 +32,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#9DD6EB',
+    backgroundColor: '#FFF',
   },
   slide2: {
     flex: 1,
@@ -41,7 +47,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#92BBD9',
   },
   text: {
-    color: '#fff',
+    color: '#92BBD9',
     fontSize: 30,
     fontWeight: 'bold',
   },
@@ -50,11 +56,17 @@ const styles = StyleSheet.create({
     height: 5000,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#97CAE5'
+    backgroundColor: '#000'
+  },
+  backgroundImage: {
+    flex: 1,
+    width: null,
+    height: null,
   }
+
 })
 
-const menu = ['사용법을 들으시려면 화면을 터치하세요', '자음 연습', '모음 연습', '낱말 연습', '음성 텍스트 변환','사진 텍스트 변환'];
+const menu = ['사용법을 들으시려면 화면을 터치하세요', '자음 연습', '모음 연습', '낱말 연습', '음성 텍스트 변환', '사진 텍스트 변환'];
 const explain = ['저희가 제공하는 학습 기능은 자음 연습, 모음 연습, 낱말 연습, 텍스트 변환이 있습니다. 각 학습 메뉴로 이동하려면 화면을 스와이프하여 넘기세요. 각 메뉴에서 해당 설명을 들으시려면 화면을 길게 터치하시고, 학습을 시작하려면 화면을 짧게 터치하시면 됩니다.',
   '자음 연습입니다. 한국어의 자음은 총 14개 입니다. 점자판에 기역. 부터 순서대로 표시되며, 자음 하나에 해당하는 점자를 읽으신 후 화면을 터치하시면 계속 안내를 해 드리겠습니다. 자음 연습을 시작하려면 화면을 짧게 터치해주세요.',
   '모음 연습입니다. 한국어의 모음은 총 10개 입니다. 점자판에 아. 부터 순서대로 표시되며, 모음 하나에 해당하는 점자를 읽으신 후 화면을 터치하시면 계속 안내를 해 드리겠습니다. 모음 연습을 시작하려면 화면을 짧게 터치해주세요.',
@@ -66,9 +78,6 @@ const Consonant = ['', '기역', '니은', '디귿', '리을', '미음', '비읍
 const Vowel = ['', 'ㅏ.', 'ㅑ.', 'ㅓ.', 'ㅕ.', 'ㅗ.', 'ㅛ.', 'ㅜ.', 'ㅠ.', 'ㅡ.', 'ㅣ.'];
 
 const forRecord = ['녹음을 시작합니다. 화면을 터치하세요. 녹음이 끝나면 화면을 다시 터치해주세요.', '녹음이 종료되었습니다.']
-
-
-
 
 
 class Home extends Component {
@@ -94,7 +103,6 @@ class Home extends Component {
 
     this.recordingSettings = JSON.parse(JSON.stringify({
       ...Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
-
       ios: {
         ...Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY.ios,
         extension: '.amr_wb',
@@ -104,6 +112,9 @@ class Home extends Component {
   }
 
 
+  async PlayIntro() {
+    await Intro();
+  }
 
   async _Speech(StrToSpeak) {
 
@@ -132,7 +143,7 @@ class Home extends Component {
     var str = '낱말 연습을 시작합니다. 화면을 터치하세요.';
 
 
-    await _getResponse(4);
+    await _getResponse(4, null);
     console.log(result.length);
 
     console.log(typeof (result));
@@ -152,7 +163,6 @@ class Home extends Component {
     await beep.loadAsync(require('./beep.mp3'));
     await beep.setPositionAsync(6500);
     await beep.playFromPositionAsync();
-    //await beep.stopAsync();
 
   }
   _askForPermissions = async () => {
@@ -162,7 +172,10 @@ class Home extends Component {
     });
 
 
+
   };
+
+
 
   async Record() {
 
@@ -200,7 +213,7 @@ class Home extends Component {
     if (this.state.haveRecordingPermissions === true && this.state.flagRecording === 1) {
       this.state.flagRecording = 2;
 
-      this._playBeep();
+      await this._playBeep();
 
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
@@ -225,8 +238,7 @@ class Home extends Component {
     if (this.state.haveRecordingPermissions === true && this.state.flagRecording === 2) {
 
       await this.recording.stopAndUnloadAsync();
-      console.log('Recording End');
-      console.log(this.recording.getURI());
+
 
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
@@ -246,16 +258,29 @@ class Home extends Component {
           shouldCorrectPitch: this.state.shouldCorrectPitch,
         },
       );
+
+      console.log('Recording End');
       this.sound = sound.sound;
 
-      //console.log(typeof(this.sound));
-      Audio.playAsync = this.sound.playAsync.bind(this);
+      console.log(Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_AMR_WB);
+      //Audio.playAsync = this.sound.playAsync.bind(this);
       //await this.sound.playAsync();
       //await this.sound.stopAsync();
 
       ///////////////////////텍스트 변환 코드 여기에////////////////////////////
 
-      //await _Google(this.recording.getURI());
+      const info = await FileSystem.getInfoAsync(this.recording.getURI());
+      console.log(typeof (info['uri']));
+
+
+
+      const options = { encoding: FileSystem.EncodingTypes.Base64 };
+      const data = await FileSystem.readAsStringAsync(info['uri'], options);
+
+      await console.log(info['uri']);
+
+      
+      await _getResponse(5, await getData(info['uri']));
 
       ////////////////////////////////////////////////////////////////////////
 
@@ -268,8 +293,12 @@ class Home extends Component {
       }
       //console.log(info);
       //console.log(this.sound);
+      
       this._Speech(forRecord[1]);
       this.state.flagRecording = 0;
+
+      str = '이 낱말은 ' + result + ' 입니다. 다음 낱말을 연습하시려면 화면을 터치하세요.';
+      await this._Speech(str);
       return;
     }
   }
@@ -284,7 +313,7 @@ class Home extends Component {
 
     if (this.state.vowelCnt === 0) // start
     {
-      _getResponse(3);
+      _getResponse(3, null);
 
       var str = '모음 연습을 시작합니다. 화면을 터치하세요.';
 
@@ -308,7 +337,7 @@ class Home extends Component {
 
     }
     if (this.state.vowelCnt > 10) {
-      _getResponse(0);
+      _getResponse(0, null);
       this.setState({
         vowelCnt: 0
       });
@@ -322,7 +351,7 @@ class Home extends Component {
     if (this.state.flagCons === 0 && this.state.consCnt === 0) // start
     {
 
-      _getResponse(1);
+      _getResponse(1, null);
       var str = '자음 연습을 시작합니다. 화면을 터치하세요.';
 
       this._Speech(str);
@@ -335,7 +364,7 @@ class Home extends Component {
 
     if (this.state.flagCons === 0 && this.state.consCnt > 12) {
 
-      _getResponse(2);
+      _getResponse(2, null);
 
       this.setState({
         consCnt: 1, flagCons: 1
@@ -380,7 +409,7 @@ class Home extends Component {
         });
 
         this._Speech('자음 연습이 끝났습니다. 다른 학습 메뉴로 스와이프 해 주세요.');
-        _getResponse(0);
+        _getResponse(0, null);
       }
 
     }
@@ -418,33 +447,40 @@ class Home extends Component {
   }
 
   async _callCam() {
-    this.props.navigator.push({id: 'CameraCapture'});
+    this.props.navigator.push({ id: 'CameraCapture' });
   }
+
+
 
   componentDidMount() {
     if (this.state.flagStart === 0) {
-      this.setState({ flagStart: 1 });
+
       this._speakIntro();
       this._speakMenu(0);
-      _getResponse(0);
+      _getResponse(0, null);
+      const { navigate } = this.props.navigation;
+
 
     }
-    
-    
   }
+
   render() {
+
     this._speakMenu = this._speakMenu.bind(this);
     this._Cons = this._Cons.bind(this);
     this._Vowel = this._Vowel.bind(this);
     this._Voice_to_Text = this._Voice_to_Text.bind(this);
+    const { navigate } = this.props.navigation;
 
-    const {navigate} = this.props.navigation;
 
+    //console.log(this.props.navigation);
+    console.log(AppState.currentState);
     return (
-      <Swiper style={styles.wrapper} onIndexChanged={this._speakMenu.bind(Swiper.index)} loop={true} >
+
+      <Swiper style={styles.wrapper} showsButtons={true} showsPagination={false} onIndexChanged={this._speakMenu.bind(Swiper.index)} loop={true}  >
         <View style={styles.slide1}>
           <TouchableHighlight onPress={() => this._speakExplain(0)}>
-            <View style={styles.button}>
+            <View style={styles.button} >
               <Text style={styles.text}>사용법</Text>
             </View>
           </TouchableHighlight>
@@ -463,22 +499,22 @@ class Home extends Component {
             </View>
           </TouchableHighlight>
         </View>
-        <View style={styles.slide2}>
+        <View style={styles.slide1}>
           <TouchableHighlight onPress={() => this._Words()} onLongPress={() => this._speakExplain(3)} underlayColor="white">
             <View style={styles.button}>
               <Text style={styles.text}>낱말 연습</Text>
             </View>
           </TouchableHighlight>
         </View>
-        <View style={styles.slide3}>
+        <View style={styles.slide1}>
           <TouchableHighlight onPress={() => this._Voice_to_Text()} onLongPress={() => this._speakExplain(4)} underlayColor="white">
             <View style={styles.button}>
               <Text style={styles.text}>음성 텍스트 변환</Text>
             </View>
           </TouchableHighlight>
         </View>
-        <View style={styles.slide3}>
-          <TouchableHighlight onPress = {() => navigate('Cam')} onLongPress={() => this._speakExplain(4)} underlayColor="white">
+        <View style={styles.slide1}>
+          <TouchableHighlight onPress={() => navigate('Cam')} onLongPress={() => this._speakExplain(4)} underlayColor="white">
             <View style={styles.button}>
               <Text style={styles.text}>사진 텍스트 변환</Text>
             </View>
@@ -487,6 +523,7 @@ class Home extends Component {
       </Swiper>
     );
   }
+
 }
 
 const MainNavigator = createStackNavigator({
@@ -494,5 +531,5 @@ const MainNavigator = createStackNavigator({
   Cam: CameraCaputre,
 });
 
-const App = createAppContainer(MainNavigator);
-export default App;
+const JBS = createAppContainer(MainNavigator);
+export default JBS;
