@@ -27,7 +27,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : true}));
 
 
-app.get('/',(req,res) => res.send('Hello World!'))
+app.get('/',function(req,res){
+	console.log("body : ", req.body);
+	res.send('Hello World!');
+})
 
 app.post('/',function(req,res){
 	console.log("body : " , req.body);
@@ -47,6 +50,19 @@ app.post('/',function(req,res){
   		//results is an array consisting of messages collected during execution
   		console.log('results: %j', results);
 	});
+
+	  let option = {
+                        mode: 'text',
+                        //thonPath: 'path/to/python',
+                         pythonOptions: ['-u'], // get print results in real-time
+                        //riptPath: 'path/to/my/scripts',
+                         args: [req.body.data]
+        };
+        PythonShell.run('IMG.py', option, function (err, results) {
+                if (err) throw err;
+                console.log('results:\n');
+        });
+
 });
 
 
