@@ -23,10 +23,8 @@ let options = {
   //riptPath: 'path/to/my/scripts',
   args: ['value1', 'value2', 'value3']
 };
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended : true}));
-app.use(bodyParser.json({limit: '10mb', extended: true}))
-app.use(bodyParser.urlencoded({limit: '10mb', extended: true}))
+app.use(bodyParser.json({limit: '50mb', extended: true}))
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
 
 app.get('/',function(req,res){
 	console.log("body : ", req.body);
@@ -37,6 +35,10 @@ app.post('/',function(req,res){
 	console.log("body : " , req.body);
 	console.log("ip : ", req.ip);
 	res.send("양간마 양간마 안시이현 안시현 러시안룰룰룰룰룰렛 장지훈 모태솔로로로로로로 양간마 안시현 인간티머니");
+	var fs = require('fs');
+	fs.writeFile('file.txt',req.data,'utf8', function(error,data){
+		console.log(error)
+	});
 	let options = {
   			mode: 'text',
   			//thonPath: 'path/to/python',
@@ -57,7 +59,7 @@ app.post('/',function(req,res){
                         //thonPath: 'path/to/python',
                          pythonOptions: ['-u'], // get print results in real-time
                         //riptPath: 'path/to/my/scripts',
-                         args: [req.body.data]
+                         args: [1]
         };
         PythonShell.run('IMG.py', option, function (err, results) {
                 if (err) throw err;
