@@ -1,9 +1,9 @@
 #include <MemoryFree.h>
 #include <EEPROM.h>
 
-#define FIRST_PIN 0   // первый вывод
-#define LAST_PIN 53   // последний вывод
-#define PIN_LED  13   // вывод светодиода
+#define FIRST_PIN 0 
+#define LAST_PIN 53 
+#define PIN_LED  13 
 
 void PinTest1(byte pin)
 {
@@ -63,7 +63,7 @@ void setup() {
 void loop() {
   if (Serial.available() > 0) {
     switch (Serial.read()) {
-      case 'a': // Тест светодиодом
+      case 'a': 
         Serial.print(F("\nBlink test:"));
         Serial.print(F("\n\tStart blinking - please check the board led\n\t"));
         for(byte i = 1; i <= 10; i++) {
@@ -89,7 +89,7 @@ void loop() {
         Serial.println();
         displayHelp();
       break;
-      case 'c': // Тест на короткое замыкание выводов
+      case 'c': 
         Serial.print(F("\nTest of short circuit on GND or VCC and between pins:\n"));
         for(byte i = FIRST_PIN; i <= LAST_PIN; i++) {
           for(byte j = FIRST_PIN; j <= LAST_PIN; j++) {
@@ -119,4 +119,3 @@ void loop() {
     }
   }
 }
-
