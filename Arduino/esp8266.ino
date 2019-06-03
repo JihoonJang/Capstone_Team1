@@ -11,14 +11,11 @@ ESP8266WebServer server(80);
 MDNSResponder mdns;
 
 String webPage = "";
-     
-int led_pin = 13;
-     
+
 void setup(void){
      
   // подготовка:
-  pinMode(led_pin, OUTPUT);
-  digitalWrite(led_pin, LOW);
+
   Serial.begin(115200);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -127,11 +124,11 @@ void loop(void){
                "Connection: close\r\n\r\n");
   int timeout = millis() + 5000;
   while (client.available() == 0) {
-    if (timeout - millis() < 0) {
-      Serial.println(">>> Client Timeout !");
-      client.stop();
+      String line = client.readString();
+      Serial.println(line);
+      //client.stop();
       return;
-    }
+    
   }
   //server.handleClient();
 }
