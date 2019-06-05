@@ -1,8 +1,23 @@
-# For both Python 2.7 and Python 3.x
+'''from base64 import decodestring
 import base64
-f = open("file.txt", 'rb')
-img_data = f.read()
-#print(img_data)
-with open("imageToSave.png", "wb") as fh:
-    fh.write(img_data)
-    f.close()
+fw = open('file.txt', 'rb')
+file_content = fw.read()
+imagestr = base64.encodestring(file_content)
+
+with open("foo.png","wb") as f:
+    f.write(decodestring(imagestr))
+
+'''
+
+
+
+import base64
+fw = open('file.txt', 'r')
+imgstring = fw.read()
+#imagestr = base64.encodestring(file_content)
+
+
+imgdata = base64.b64decode(imgstring)
+filename = 'some_image.jpg'  # I assume you have a way of picking unique filenames
+with open(filename, 'wb') as f:
+    f.write(imgdata)

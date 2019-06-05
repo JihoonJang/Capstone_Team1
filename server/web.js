@@ -38,9 +38,16 @@ app.post('/',function(req,res){
 	console.log("aefeafew fae e");
 	console.log("body : " , dat);
 	console.log("ip : ", req.ip);
-	fs.writeFile('file.txt',dat,'utf8', function(error,data){
+	fs.writeFile('file.PNG',dat,'ba', function(error,data){
 		console.log(error)
 	});
+
+	var base64Data = req.rawBody.replace(/^data:image\/png;base64,/, "");
+
+	require("fs").writeFile("out.png", base64Data, 'base64', function(err) {
+  		console.log(err);
+	});
+
 	res.send("양간마 양간마 안시이현 안시현 러시안룰룰룰룰룰렛 장지훈 모태솔로로로로로로 양간마 안시현 인간티머니");
 	let options = {
   			mode: 'text',
