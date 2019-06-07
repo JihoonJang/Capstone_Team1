@@ -16,6 +16,13 @@ app.use(bodyParser.json({limit: '50mb', extended: false}))
 app.use(bodyParser.urlencoded({limit: '50mb', extended:false}))
 
 
+const vision = require('@google-cloud/vision');
+
+// Creates a client
+const client = new vision.ImageAnnotatorClient();
+
+
+
 router.post('/upload',upload.single('image'),(req,res,next,error) => {
 	console.log(error);
 
@@ -32,20 +39,14 @@ let options = {
 	res.send('Hello World!');
 })
 
-app.post('/',function(req,res){
+app.post('/', async function(req,res){
 	//var dataa = req.body;
 	var dat = JSON.stringify(req.body.data);
 	console.log("aefeafew fae e");
 	console.log("body : " , dat);
 	console.log("ip : ", req.ip);
-	fs.writeFile('file.PNG',dat,'ba', function(error,data){
+	fs.writeFile('file.txt',dat,'utf8', function(error,data){
 		console.log(error)
-	});
-
-	var base64Data = req.rawBody.replace(/^data:image\/png;base64,/, "");
-
-	require("fs").writeFile("out.png", base64Data, 'base64', function(err) {
-  		console.log(err);
 	});
 
 	res.send("양간마 양간마 안시이현 안시현 러시안룰룰룰룰룰렛 장지훈 모태솔로로로로로로 양간마 안시현 인간티머니");
@@ -75,6 +76,11 @@ app.post('/',function(req,res){
                 if (err) throw err;
                 console.log('results:\n');
         });
+	const fileName = 'some_image.jpg';
+	const [result] = await client.textDetection(fileName);
+	const detections = result.textAnnotations;
+	console.log('Text:');
+	detections.forEach(text => console.log(text));
 
 });
 
