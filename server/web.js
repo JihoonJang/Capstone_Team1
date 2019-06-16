@@ -41,26 +41,27 @@ let options = {
 var ard;
 var dat;
 var par;
+var wonjun;
 app.get('/',function(req,res){
 	console.log("body : ", req.body);
 	if( par == '1')
 	{
-		ard = '16,48,24,4,36,20,1,15';
+		ard = '["16,48,24,4,36,20,1,15"]';
 	}
 	if( par =='2'){
-		ard = '17,5,56,44,52,28,41,22';
+		ard = '["17,5,56,44,52,28,41,22"]';
 	}
 	if( par == '3')
 	{
-		ard = '41,22,26,37,35,19,50,49';
+		ard = '["41,22,26,37,35,19,50,49"]';
 	}
 	if(par == '4')
 	{
-		ard = '25,38';
+		ard = '["25,38"]';
 	}
 	if(par == '6')
 	{
-		ard = '31,41,53,12,13,15';
+		ard = '["31,41,53,12,13,15"]';
 	}
 	console.log(ard);
 	res.send(ard);
@@ -136,6 +137,7 @@ app.post('/', async function(req,res){
 		PythonShell.run('not.py', options, function first(err, results) {
 		
 			if (err) throw err;
+			res.send(JSON.stringify(results));
 			ard = results;
 			console.log("first");
 	  		console.log(typeof(results));
@@ -151,7 +153,6 @@ app.post('/', async function(req,res){
 			ard = results;
 	  		console.log(typeof(results));
   			console.log((results));
-			res.send(JSON.stringify(results));
 			});
 		});
 
