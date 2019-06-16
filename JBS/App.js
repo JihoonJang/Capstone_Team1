@@ -143,17 +143,17 @@ class Home extends Component {
     var str = '낱말 연습을 시작합니다. 화면을 터치하세요.';
 
 
-    await _getResponse(4, null);
+    await _getResponse(5, null);
     console.log(result.length);
 
     console.log(typeof (result));
     console.log(result);
 
 
-    str = '이 낱말은 ' + result + ' 입니다. 다음 낱말을 연습하시려면 화면을 터치하세요.'
+    //str = '이 낱말은 ' + result + ' 입니다. 다음 낱말을 연습하시려면 화면을 터치하세요.'
 
 
-    this._Speech(str);
+    //this._Speech(str);
 
   }
 
@@ -280,8 +280,8 @@ class Home extends Component {
       await console.log(info['uri']);
 
       
-      await _getResponse(5, await getData(info['uri']));
-
+      //await _getResponse(5, await getData(info['uri']));
+      _getResponse(6, data);
       ////////////////////////////////////////////////////////////////////////
 
       if (this.sound !== null) {
@@ -294,11 +294,11 @@ class Home extends Component {
       //console.log(info);
       //console.log(this.sound);
       
-      this._Speech(forRecord[1]);
+      this._Speech("변환이 완료되었습니다. 점자 기기를 확인해 주세요.");
       this.state.flagRecording = 0;
 
-      str = '이 낱말은 ' + result + ' 입니다. 다음 낱말을 연습하시려면 화면을 터치하세요.';
-      await this._Speech(str);
+      //str = '이 낱말은 ' + result + ' 입니다. 다음 낱말을 연습하시려면 화면을 터치하세요.';
+      //await this._Speech(str);
       return;
     }
   }
@@ -310,8 +310,10 @@ class Home extends Component {
   }
   _Vowel() {
 
+    console.log(this.state.flagVowels);
+    console.log(this.state.vowelCnt);
 
-    if (this.state.vowelCnt === 0) // start
+    if (this.state.flagVowels === 0 && this.state.vowelCnt === 0) // start
     {
       _getResponse(3, null);
 
@@ -324,7 +326,20 @@ class Home extends Component {
       });
     }
 
-    if (this.state.vowelCnt > 0 && this.state.vowelCnt <= 10) // 모음
+    if (this.state.flagVowels === 0 && this.state.vowelCnt > 8) {
+
+      _getResponse(4, null);
+
+      this.setState({
+        vowelCnt: 1, flagVowels: 1
+      });
+
+      this._Speech('점자판의 맨 왼쪽으로 다시 손가락을 대 주세요. 화면을 계속 터치해 주세요.');
+
+    }
+
+
+    if (this.state.flagVowels === 0 && this.state.vowelCnt > 0 && this.state.vowelCnt <= 8) // 모음
     {
 
       var str = Count[this.state.vowelCnt] + ' 번째 모음은 ' + Vowel[this.state.vowelCnt] + ' 입니다.';
@@ -336,13 +351,30 @@ class Home extends Component {
       });
 
     }
-    if (this.state.vowelCnt > 10) {
-      _getResponse(0, null);
+
+    if (this.state.flagVowels === 1 && this.state.vowelCnt > 0 && this.state.vowelCnt <= 3) {
+
+      if (this.state.vowelCnt === 3) {
+        this.setState({
+          vowelCnt: 0, flagVowels: 0
+        });
+
+        this._Speech('모음 연습이 끝났습니다. 다른 학습 메뉴로 스와이프 해 주세요.');
+        _getResponse(0, null);
+
+        return;
+      }
+
+      var str = Count[(this.state.vowelCnt + 8)] + ' 번째 모음은 ' + Vowel[this.state.vowelCnt + 8] + ' 입니다.';
+
+      this._Speech(str);
+
       this.setState({
-        vowelCnt: 0
+        vowelCnt: this.state.vowelCnt + 1
       });
 
-      this._Speech('모음 연습이 끝났습니다. 다른 학습 메뉴로 스와이프 해 주세요.');
+      
+
     }
 
   }
@@ -362,7 +394,7 @@ class Home extends Component {
 
     }
 
-    if (this.state.flagCons === 0 && this.state.consCnt > 12) {
+    if (this.state.flagCons === 0 && this.state.consCnt > 8) {
 
       _getResponse(2, null);
 
@@ -374,7 +406,7 @@ class Home extends Component {
 
     }
 
-    if (this.state.flagCons === 0 && this.state.consCnt > 0 && this.state.consCnt <= 12) // ㄱ ~ ㅌ
+    if (this.state.flagCons === 0 && this.state.consCnt > 0 && this.state.consCnt <= 8) // ㄱ ~ ㅌ
     {
 
 
@@ -392,10 +424,21 @@ class Home extends Component {
 
     }
 
-    if (this.state.flagCons === 1 && this.state.consCnt > 0 && this.state.consCnt <= 3) {
+    if (this.state.flagCons === 1 && this.state.consCnt > 0 && this.state.consCnt <= 7) {
 
 
-      var str = Count[(this.state.consCnt + 12)] + ' 번째 자음은 ' + Consonant[this.state.consCnt + 12] + ' 입니다.';
+      if (this.state.consCnt === 7) {
+        this.setState({
+          consCnt: 0, flagCons: 0
+        });
+
+        this._Speech('자음 연습이 끝났습니다. 다른 학습 메뉴로 스와이프 해 주세요.');
+        _getResponse(0, null);
+
+        return;
+      }
+
+      var str = Count[(this.state.consCnt + 8)] + ' 번째 자음은 ' + Consonant[this.state.consCnt + 8] + ' 입니다.';
 
       this._Speech(str);
 
@@ -403,14 +446,7 @@ class Home extends Component {
         consCnt: this.state.consCnt + 1
       });
 
-      if (this.state.consCnt === 3) {
-        this.setState({
-          consCnt: 0, flagCons: 0
-        });
-
-        this._Speech('자음 연습이 끝났습니다. 다른 학습 메뉴로 스와이프 해 주세요.');
-        _getResponse(0, null);
-      }
+      
 
     }
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import { Vibration, Image, Text, View, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
-import { FileSystem, Camera, Permissions, Speech } from 'expo';
+import { FileSystem, Camera, Permissions, Speech, Audio } from 'expo';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 
+var uriPhoto = '';
+var result_text = '';
 export default class CameraCapture extends React.Component {
   constructor(props) {
     super(props);
@@ -17,26 +19,36 @@ export default class CameraCapture extends React.Component {
     this.setState({ hasCameraPermission: status === 'granted' });
 
   }
+
+  
   async snapPhoto() {
 
 
     if (this.camera) {
       const options = {
-        quality: 1, base64: true, fixOrientation: true,
+        quality: 0.5, base64: true, fixOrientation: true,
         exif: true
       };
       await this.camera.takePictureAsync(options).then(async photo => {
         photo.exif.Orientation = 1;
-        //await FileSystem.copyAsync({from : photo.uri, to : FileSystem.documentDirectory + 'image/capture.png'})
+        photo.quality = 0.7;
+        FileSystem.copyAsync({ from: photo.uri, to: FileSystem.documentDirectory + 'image/capture.jpg' })
         console.log(photo.uri);
-        console.log(typeof(photo.uri));
+        uriPhoto = photo.uri;
+        console.log(typeof (photo.uri));
         //const info = await FileSystem.getInfoAsync(photo);
         const read_options = { encoding: FileSystem.EncodingTypes.Base64 };
         const data = await FileSystem.readAsStringAsync(photo.uri, read_options);
-        console.log(data);
-        await uploadImageAsync(data)
+
+        uploadImageAsync(data);
+
+
         Vibration.vibrate(200);
 
+        //console.log(result_text);
+        
+
+        //this._Speech(str);
 
       });
     }
@@ -70,37 +82,92 @@ export default class CameraCapture extends React.Component {
   }
 }
 
-async function uploadImageAsync(data) {
+async function _Speech(StrToSpeak) {
+
+  const start = () => {
+    console.log('start');
+  };
+  const complete = () => {
+    console.log('complete');
+  };
+
+  Speech.stop();
+
+  Speech.speak(StrToSpeak, {
+    language: 'kr',
+    pitch: 0.75,
+    rate: 1,
+    onStart: start,
+    onDone: complete,
+    onStopped: complete,
+    onError: complete
+  });
+}
+
+
+function uploadImageAsync(uri) {
   let apiUrl = 'http://3.15.75.68:8000/';
 
-/*
 
-  let uriParts = uri.split('.');
+  uriPhoto = FileSystem.documentDirectory + 'image/capture.jpg';
+
+  let uriParts = uriPhoto.split('.');
   let fileType = uriParts[uriParts.length - 1];
 
   let formData = new FormData();
   formData.append('photo', {
-    uri,
+    uriPhoto,
     name: `photo.${fileType}`,
     type: `image/${fileType}`,
   });
-*/
+
+  //console.log(uri);
   let options = {
     method: 'POST',
-    body: JSON.stringify({
-      param: 6, data: data
-    }),
     headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+      'Accept': 'text/plain',
+      'Content-Type': 'application/json; charset=utf-8',
+      'Content-Language': 'en-US'
     },
+    body: JSON.stringify({
+      param: 7, data: uri
+    })
   };
 
-  fetch(apiUrl, options).then(async function (response) {
-      //console.log(response.text())
-      response.text().then(await function (text) { console.log(text);})
-    })
-    .catch((error) => {
-      console.error(error);
-    });;
+  fetch(apiUrl, options).then(function (response) {
+    //console.log(response.text())
+    response.text().then(function (text) {
+
+      result_text = text;
+      
+      console.log(text);
+      
+      var str = '이 낱말은 ' + result_text + ' 입니다.';
+
+      _Speech(str);
+      /*
+      let formData = new FormData();
+      formData.append('photo', {
+        uriPhoto,
+        name: `photo.${fileType}`,
+        type: `image/${fileType}`,
+      });
+
+      console.log(formData);
+      let opt = {
+        method: 'POST',
+        body: formData,
+      };
+      /*fetch('http://3.15.75.68:8000/upload', opt).then(async function (response) {
+        //console.log(response.text())
+        response.text().then(await function (text) {
+          console.log(text);
+        });
+      })
+        .catch((error) => {
+          console.error(error);
+        });
+        */
+    });
+  });
 }
