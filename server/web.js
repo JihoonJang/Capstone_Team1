@@ -28,51 +28,68 @@ router.post('/upload',upload.single('image'),(req,res,next,error) => {
 
 });
 module.exports = router;
+/*
 let options = {
   mode: 'text',
   //thonPath: 'path/to/python',
   pythonOptions: ['-u'], // get print results in real-time
   //riptPath: 'path/to/my/scripts',
   args: ['value1', 'value2', 'value3']
-};app.get('/',function(req,res){
+};
+
+*/
+var ard;
+var dat;
+var par;
+app.get('/',function(req,res){
 	console.log("body : ", req.body);
-	res.send('Hello World!');
+	if( par == '1')
+	{
+		ard = '16,48,24,4,36,20,1,15';
+	}
+	if( par =='2'){
+		ard = '17,5,56,44,52,28,41,22';
+	}
+	if( par == '3')
+	{
+		ard = '41,22,26,37,35,19,50,49';
+	}
+	if(par == '4')
+	{
+		ard = '25,38';
+	}
+	if(par == '6')
+	{
+		ard = '31,41,53,12,13,15';
+	}
+	console.log(ard);
+	res.send(ard);
+
 })
 
 app.post('/', async function(req,res){
 	//var dataa = req.body;
-	var dat = JSON.stringify(req.body.data);
+	dat = JSON.stringify(req.body.data);
+	par = JSON.stringify(req.body.param);
 	console.log("aefeafew fae e");
-	console.log("body : " , dat);
+	console.log("data :  " , dat);
+
+	console.log("param : " , par);
 	console.log("ip : ", req.ip);
-	fs.writeFile('file.txt',dat,'utf8', function(error,data){
-		console.log(error)
-	});
 
-	res.send("양간마 양간마 안시이현 안시현 러시안룰룰룰룰룰렛 장지훈 모태솔로로로로로로 양간마 안시현 인간티머니");
-	let options = {
-  			mode: 'text',
-  			//thonPath: 'path/to/python',
- 			 pythonOptions: ['-u'], // get print results in real-time
-  			//riptPath: 'path/to/my/scripts',
- 			 args: [req.body.param, 'value2', 'value3']
-	};
-	PythonShell.run('trans.py', options, function (err, results) {
-		if (err) throw err;
-
-
-  		//results is an array consisting of messages collected during execution
-  		console.log('results: %j', results);
-	});
+	if(par == '7' || par == '6')
+	{
+		fs.writeFile('file.txt',dat,'utf8',async function(error,data){
+			if (error) throw error;
+	if( par == '7')
+	{
 
 	  let option = {
                         mode: 'text',
-                        //thonPath: 'path/to/python',
                          pythonOptions: ['-u'], // get print results in real-time
-                        //riptPath: 'path/to/my/scripts',
                          args: [1]
         };
-        PythonShell.run('IMG.py', option, function (err, results) {
+        PythonShell.run('IMG.py', option, await function (err, results) {
                 if (err) throw err;
                 console.log('results:\n');
         });
@@ -80,7 +97,73 @@ app.post('/', async function(req,res){
 	const [result] = await client.textDetection(fileName);
 	const detections = result.textAnnotations;
 	console.log('Text:');
-	detections.forEach(text => console.log(text));
+	console.log(detections[0].description);
+	//console.log(detections);
+	res.send(detections[0].description);
+//	var te;
+//	detections.forEach(text =>{
+		//console.log(text);
+		//res.send((text.description));
+		//console.log('finishi');
+		//te = text.description;
+		/*
+		te = JSON.stringify(text.descriptions);
+		console.log(te)
+			let options3 = {
+  					 mode: 'text',
+ 					 pythonOptions: ['-u'], // get print results in real-time
+ 					 args: [text.descriptions, 'value2', 'value3']
+			};
+			PythonShell.run('trans.py', options3, function (err, results) {
+		
+			if (err) throw err;
+			ard = results;
+	  		console.log(typeof(results));
+  			console.log((results));
+			});
+*/
+//	});
+		//console.log(te);
+	}
+		});
+	}
+	if( par == '5'){
+		let options = {
+  				 mode: 'text',
+ 				 pythonOptions: ['-u'], // get print results in real-time
+ 				 args: ['value', 'value2', 'value3']
+		};
+		PythonShell.run('not.py', options, function first(err, results) {
+		
+			if (err) throw err;
+			ard = results;
+			console.log("first");
+	  		console.log(typeof(results));
+  			console.log((results));
+			let options2 = {
+  					 mode: 'text',
+ 					 pythonOptions: ['-u'], // get print results in real-time
+ 					 args: [ard, 'value2', 'value3']
+			};
+			PythonShell.run('trans.py', options2, function second(err, results) {
+		
+			if (err) throw err;
+			ard = results;
+	  		console.log(typeof(results));
+  			console.log((results));
+			res.send(JSON.stringify(results));
+			});
+		});
+
+
+
+
+	}
+
+	if( par == '1' || par == '2' || par == '3'  || par =='4'){
+		req.body.data = '가나다';
+	}
+	
 
 });
 

@@ -3,7 +3,6 @@
 import sys
 import json
 import hbcvt
-flag = sys.argv[1]
 re = []
 def tr(a):
     x = hbcvt.h2b.text(str(a))
@@ -24,9 +23,9 @@ def tr(a):
         for j in range(6):
             total = total + i[j] * pow(2,5-j)
         
-        rr = rr + str(total) + ',' 
+        rr = rr + str(total) +", "
     print(rr)
 
 
     
-tr(flag)
+tr('가나다')
