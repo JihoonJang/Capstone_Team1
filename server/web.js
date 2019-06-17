@@ -40,28 +40,39 @@ let options = {
 */
 var ard;
 var dat;
-var par;
+var par= '9';
 var wonjun;
 app.get('/',function(req,res){
 	console.log("body : ", req.body);
 	if( par == '1')
 	{
-		ard = '["16,48,24,4,36,20,1,15"]';
+		ard = '["16,48,24,4,36,20,1,15,"]';
 	}
-	if( par =='2'){
-		ard = '["17,5,56,44,52,28,41,22"]';
+	else if( par =='2'){
+		ard = '["17,5,56,44,52,28,41,22,"]';
 	}
-	if( par == '3')
+	else if( par == '3')
 	{
-		ard = '["41,22,26,37,35,19,50,49"]';
+		ard = '["41,22,26,37,35,19,50,49,"]';
 	}
-	if(par == '4')
+	else if(par == '4')
 	{
-		ard = '["25,38"]';
+		ard = '["25,38,"]';
 	}
-	if(par == '6')
+	else if(par == '6')
 	{
-		ard = '["31,41,53,12,13,15"]';
+		ard = '["31,41,53,12,13,15,"]';
+	}
+	else if(par == '7')
+	{
+
+		ard = '["31,41,53,12,13,15,"]';
+	}
+	else if(par =='5')
+	{
+	}
+	else{
+		ard = '["0,0,0,0,0,0,0,0,"]';
 	}
 	console.log(ard);
 	res.send(ard);
